@@ -11,6 +11,7 @@ function checkURLChange(){
     oldURL = newURL;
     window.ReactNativeWebView.postMessage(newURL);
     video = window.document.getElementsByTagName('video')[0];
+    openFullscreen();
     updateListeners();
   }
 }
@@ -53,23 +54,53 @@ video.onseeked = function() {
 };
 
 const handleCommand = (message) => {
-try {
-  console.log('Message recieved from RN: ', message);
-  switch (message.data) {
-    case 'PLAY':
-      video.play();
-      break;
-    case 'PAUSE':
-      video.pause();
-      break;
-    default:
-      break;
-  }
-} catch (e) {
-  // dispatch('ERROR', e.message);
-  console.log(e.message);
-}
+	try {
+	    console.log('Message recieved from RN: ', message);
+	    switch (message.data) {
+	      case 'PLAY':
+	        video.play();
+	        break;
+	      case 'PAUSE':
+	        video.pause();
+	        break;
+	      case 'FULLSCREEN':
+	      	openFullscreen();
+	      	break;
+	      case 'UNFULLSCREEN':
+	      	closeFullscreen();
+	      	break;
+	      default:
+	        break;
+    	}
+	} catch (e) {
+    	// dispatch('ERROR', e.message);
+    	console.log(e.message);
+	}
 };
+
+const openFullscreen = () => {
+	if (video.requestFullscreen) {
+	  video.requestFullscreen();
+	} else if (video.msRequestFullscreen) {
+	  video.msRequestFullscreen();
+	} else if (video.mozRequestFullScreen) {
+	  video.mozRequestFullScreen();
+	} else if (video.webkitRequestFullscreen) {
+	  video.webkitRequestFullscreen();
+	}
+}
+
+function closeFullscreen() {
+  if (video.exitFullscreen) {
+    video.exitFullscreen();
+  } else if (video.mozCancelFullScreen) { /* Firefox */
+    video.mozCancelFullScreen();
+  } else if (video.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+    video.webkitExitFullscreen();
+  } else if (video.msExitFullscreen) { /* IE/Edge */
+    video.msExitFullscreen();
+  }
+}
 `;
 
 export default js;

@@ -1,17 +1,39 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {WebView} from 'react-native-webview';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {View, StyleSheet, TouchableOpacity, Alert} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  BackHandler,
+} from 'react-native';
 import js from './injectJS';
 
+const youtubeURL = 'https://www.youtube.com';
+
 const App = () => {
-  const webview = useRef();
-  const [isVideo, setIsVideo] = useState(true);
+  let webview = useRef();
+  const [initialURL, setInitialURL] = useState(youtubeURL);
+  const [isVideo, setIsVideo] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', function() {
+      try {
+        webview.goBack();
+      } catch {
+        setInitialURL(initialURL + '?t=' + Date.now());
+        false;
+      }
+    });
+  });
 
   // Inject JS
   setTimeout(() => {
-    webview.current.injectJavaScript(js);
+    if (webview) {
+      webview.current.injectJavaScript(js);
+    }
   }, 3000);
 
   // Handle message from WebView
